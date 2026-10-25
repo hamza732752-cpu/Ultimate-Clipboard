@@ -1,0 +1,431 @@
+<Window x:Class="UltimateClipboard.Views.ClipboardPanel"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="clr-namespace:UltimateClipboard.Converters"
+        xmlns:vm="clr-namespace:UltimateClipboard.ViewModels"
+        Title="Ultimate Clipboard"
+        Width="420" Height="580"
+        MinWidth="320" MinHeight="400"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="CanResizeWithGrip"
+        KeyDown="Window_KeyDown"
+        Deactivated="Window_Deactivated"
+        Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <conv:ContentTypeToIconConverter x:Key="TypeIconConverter"/>
+        <conv:BytesToImageConverter x:Key="BytesToImageConverter"/>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
+        <conv:RelativeTimeConverter x:Key="RelativeTimeConverter"/>
+        <conv:FileSizeConverter x:Key="FileSizeConverter"/>
+        <conv:BoolToSymbolConverter x:Key="BoolToSymbolConverter"/>
+    </Window.Resources>
+
+    <!-- Main container with rounded corners and shadow -->
+    <Border CornerRadius="12"
+            Background="{DynamicResource WindowBackground}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="1"
+            Margin="8">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" 
+                              ShadowDepth="4" 
+                              Opacity="0.3" 
+                              Color="#000000"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>   <!-- Title bar -->
+                <RowDefinition Height="Auto"/>   <!-- Search -->
+                <RowDefinition Height="Auto"/>   <!-- Filters -->
+                <RowDefinition Height="*"/>      <!-- List -->
+                <RowDefinition Height="Auto"/>   <!-- Status bar -->
+            </Grid.RowDefinitions>
+
+            <!-- Title Bar -->
+            <Border Grid.Row="0" 
+                    Background="{DynamicResource PanelBackground}"
+                    CornerRadius="12,12,0,0"
+                    Padding="16,10,8,10"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- App icon -->
+                    <TextBlock Grid.Column="0" 
+                               Text="&#xE77F;"
+                               FontFamily="{StaticResource SegoeIcons}"
+                               FontSize="18"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0"/>
+
+                    <!-- Title -->
+                    <TextBlock Grid.Column="1"
+                               Text="Ultimate Clipboard"
+                               FontFamily="{StaticResource SegoeUI}"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               VerticalAlignment="Center"/>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="8" Height="8"
+                                 Fill="{DynamicResource SuccessBrush}"
+                                 Margin="0,0,8,0"
+                                 ToolTip="Monitoring active"
+                                 x:Name="MonitoringDot"/>
+                        <Button Content="&#xE713;" 
+                                Style="{StaticResource IconButtonStyle}"
+                                ToolTip="Settings"
+                                Margin="0,0,4,0"
+                                Click="SettingsButton_Click"/>
+                        <Button Content="&#xE8BB;" 
+                                Style="{StaticResource IconButtonStyle}"
+                                ToolTip="Close (Esc)"
+                                Click="CloseButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Search Bar -->
+            <Border Grid.Row="1" Padding="12,4,12,4">
+                <Grid>
+                    <TextBox x:Name="SearchBox"
+                             Style="{StaticResource SearchTextBoxStyle}"
+                             Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Delay=100}"
+                             Tag="Search clipboard history... (Ctrl+F)"/>
+
+                    <!-- Placeholder text -->
+                    <TextBlock Text="Search clipboard history... (Ctrl+F)"
+                               FontFamily="{StaticResource SegoeUI}"
+                               FontSize="14"
+                               Foreground="{DynamicResource TertiaryTextBrush}"
+                               Padding="14,9"
+                               IsHitTestVisible="False"
+                               Visibility="{Binding Text.Length, ElementName=SearchBox, 
+                                            Converter={StaticResource BoolToVisConverter}, 
+                                            ConverterParameter=Invert}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text.Length, ElementName=SearchBox}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- Search icon -->
+                    <TextBlock Text="&#xE721;"
+                               FontFamily="{StaticResource SegoeIcons}"
+                               FontSize="14"
+                               Foreground="{DynamicResource TertiaryTextBrush}"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"
+                               IsHitTestVisible="False"/>
+                </Grid>
+            </Border>
+
+            <!-- Filter Tabs -->
+            <Border Grid.Row="2" Padding="12,2,12,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <RadioButton Content="All" GroupName="Filter" IsChecked="True"
+                                     Style="{StaticResource FilterButtonStyle}"
+                                     Command="{Binding SetFilterCommand}" CommandParameter="All"/>
+                        <RadioButton Content="Text" GroupName="Filter"
+                                     Style="{StaticResource FilterButtonStyle}"
+                                     Command="{Binding SetFilterCommand}" CommandParameter="Text"/>
+                        <RadioButton Content="Images" GroupName="Filter"
+                                     Style="{StaticResource FilterButtonStyle}"
+                                     Command="{Binding SetFilterCommand}" CommandParameter="Images"/>
+                        <RadioButton Content="Files" GroupName="Filter"
+                                     Style="{StaticResource FilterButtonStyle}"
+                                     Command="{Binding SetFilterCommand}" CommandParameter="Files"/>
+                        <RadioButton Content="Pinned" GroupName="Filter"
+                                     Style="{StaticResource FilterButtonStyle}"
+                                     Command="{Binding SetFilterCommand}" CommandParameter="Pinned"/>
+                        <RadioButton Content="&#xE734;" GroupName="Filter"
+                                     FontFamily="{StaticResource SegoeIcons}"
+                                     Style="{StaticResource FilterButtonStyle}"
+                                     Command="{Binding SetFilterCommand}" CommandParameter="Favorites"
+                                     ToolTip="Favorites"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" 
+                            Content="Clear All"
+                            Style="{StaticResource ClearAllButtonStyle}"
+                            Click="ClearAllButton_Click"
+                            ToolTip="Clear all unpinned history"/>
+                </Grid>
+            </Border>
+
+            <!-- Clipboard History List -->
+            <ListBox Grid.Row="3"
+                     x:Name="EntriesList"
+                     ItemsSource="{Binding Entries}"
+                     SelectedItem="{Binding SelectedEntry}"
+                     SelectedIndex="{Binding SelectedIndex}"
+                     MouseDoubleClick="EntriesList_MouseDoubleClick"
+                     ItemContainerStyle="{StaticResource ClipboardListBoxItemStyle}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ScrollViewer.CanContentScroll="False"
+                     VirtualizingPanel.IsVirtualizing="True"
+                     VirtualizingPanel.VirtualizationMode="Recycling"
+                     VirtualizingPanel.ScrollUnit="Pixel"
+                     Padding="4,0">
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Type Icon -->
+                            <Border Grid.Column="0"
+                                    Width="32" Height="32"
+                                    CornerRadius="6"
+                                    Background="{DynamicResource TypeIconBackgroundBrush}"
+                                    VerticalAlignment="Top"
+                                    Margin="0,2,0,0">
+                                <TextBlock Text="{Binding ContentType, Converter={StaticResource TypeIconConverter}}"
+                                           FontFamily="{StaticResource SegoeIcons}"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource TypeIconTextBrush}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+
+                            <!-- Content area -->
+                            <StackPanel Grid.Column="1" Margin="10,0,8,0">
+                                <!-- Text preview -->
+                                <TextBlock Text="{Binding Preview}"
+                                           FontFamily="{StaticResource SegoeUI}"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxHeight="52"
+                                           TextWrapping="Wrap"
+                                           LineStackingStrategy="BlockLineHeight"
+                                           LineHeight="18"/>
+
+                                <!-- File items preview -->
+                                <ItemsControl ItemsSource="{Binding FileItems}" 
+                                              Visibility="{Binding IsFileEntry, Converter={StaticResource BoolToVisConverter}}"
+                                              Margin="0,4,0,2">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource HoverBrush}" 
+                                                    CornerRadius="4" 
+                                                    Padding="6,3" 
+                                                    Margin="0,1"
+                                                    ToolTip="{Binding FullPath}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" 
+                                                               Text="{Binding IconGlyph}" 
+                                                               FontFamily="{StaticResource SegoeIcons}" 
+                                                               FontSize="12" 
+                                                               Foreground="{DynamicResource AccentBrush}"
+                                                               VerticalAlignment="Center" 
+                                                               Margin="0,0,6,0"/>
+                                                    <TextBlock Grid.Column="1" 
+                                                               Text="{Binding FileName}" 
+                                                               FontFamily="{StaticResource SegoeUI}" 
+                                                               FontSize="11" 
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource PrimaryTextBrush}" 
+                                                               TextTrimming="CharacterEllipsis" 
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="2" 
+                                                               Text="{Binding SizeText}" 
+                                                               FontFamily="{StaticResource SegoeUI}" 
+                                                               FontSize="10" 
+                                                               Foreground="{DynamicResource TertiaryTextBrush}" 
+                                                               VerticalAlignment="Center"
+                                                               Margin="8,0,2,0"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- More files indicator -->
+                                <TextBlock Text="{Binding ExtraFileCount, StringFormat='+ {0} more files'}"
+                                           FontFamily="{StaticResource SegoeUI}"
+                                           FontSize="10"
+                                           FontStyle="Italic"
+                                           Foreground="{DynamicResource TertiaryTextBrush}"
+                                           Visibility="{Binding ExtraFileCount, Converter={StaticResource BoolToVisConverter}}"
+                                           Margin="4,1,0,2"/>
+
+                                <!-- Image thumbnail -->
+                                <Border CornerRadius="4" 
+                                        BorderBrush="{DynamicResource BorderBrush}" 
+                                        BorderThickness="1"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,6,0,2"
+                                        Visibility="{Binding ThumbnailData, Converter={StaticResource BoolToVisConverter}}">
+                                    <Image Source="{Binding ThumbnailData, Converter={StaticResource BytesToImageConverter}}"
+                                           MaxHeight="100"
+                                           MaxWidth="220"
+                                           Stretch="Uniform">
+                                        <Image.Clip>
+                                            <RectangleGeometry Rect="0,0,220,100" RadiusX="4" RadiusY="4"/>
+                                        </Image.Clip>
+                                    </Image>
+                                </Border>
+
+                                <!-- Meta info row -->
+                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                    <TextBlock Text="{Binding TypeLabel}"
+                                               FontFamily="{StaticResource SegoeUI}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TertiaryTextBrush}"
+                                               Margin="0,0,8,0"/>
+                                    <TextBlock Text="{Binding CapturedAt, Converter={StaticResource RelativeTimeConverter}}"
+                                               FontFamily="{StaticResource SegoeUI}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TertiaryTextBrush}"
+                                               Margin="0,0,8,0"/>
+                                    <TextBlock Text="{Binding ContentSizeBytes, Converter={StaticResource FileSizeConverter}}"
+                                               FontFamily="{StaticResource SegoeUI}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TertiaryTextBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Action buttons -->
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
+                                <!-- Reveal in File Explorer (for Files) -->
+                                <Button Content="&#xE838;"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        Command="{Binding DataContext.OpenInExplorerCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
+                                        Visibility="{Binding IsFileEntry, Converter={StaticResource BoolToVisConverter}}"
+                                        ToolTip="Reveal in File Explorer"/>
+
+                                <!-- Copy to Clipboard -->
+                                <Button Content="&#xE8C8;"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        Command="{Binding DataContext.SelectAndCopyCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="Copy to Clipboard"/>
+
+                                <!-- Pin -->
+                                <Button Content="{Binding IsPinned, Converter={StaticResource BoolToSymbolConverter}, ConverterParameter=pin}"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        Command="{Binding DataContext.TogglePinCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="Pin/Unpin"/>
+
+                                <!-- Favorite -->
+                                <Button Content="{Binding IsFavorite, Converter={StaticResource BoolToSymbolConverter}, ConverterParameter=fav}"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        Command="{Binding DataContext.ToggleFavoriteCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="Favorite"/>
+
+                                <!-- Delete -->
+                                <Button Content="&#xE74D;"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        Command="{Binding DataContext.DeleteEntryCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="Delete"/>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Empty state -->
+            <StackPanel Grid.Row="3"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        IsHitTestVisible="False"
+                        Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisConverter}}">
+                <TextBlock Text="&#xE77F;"
+                           FontFamily="{StaticResource SegoeIcons}"
+                           FontSize="48"
+                           Foreground="{DynamicResource TertiaryTextBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,12"/>
+                <TextBlock Text="No clipboard history yet"
+                           FontFamily="{StaticResource SegoeUI}"
+                           FontSize="14"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="Copy something to get started"
+                           FontFamily="{StaticResource SegoeUI}"
+                           FontSize="12"
+                           Foreground="{DynamicResource TertiaryTextBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <!-- Status Bar -->
+            <Border Grid.Row="4"
+                    Background="{DynamicResource StatusBarBackground}"
+                    CornerRadius="0,0,12,12"
+                    Padding="12,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding StatusText}"
+                               FontFamily="{StaticResource SegoeUI}"
+                               FontSize="11"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               VerticalAlignment="Center"/>
+
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding MonitoringStatusText}"
+                               FontFamily="{StaticResource SegoeUI}"
+                               FontSize="11"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"/>
+
+                    <!-- Resize grip visual -->
+                    <TextBlock Grid.Column="2"
+                               Text="⋮⋮"
+                               FontSize="10"
+                               Foreground="{DynamicResource TertiaryTextBrush}"
+                               VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,26 @@
+## Build results
+[Bb]in/
+[Oo]bj/
+dist/
+build/
+
+## Visual Studio & IDEs
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+.vscode/
+
+## User-specific & local test artifacts
+*.userprefs
+TestResults/
+
+## SQLite local temporary runtime files
+*.db-shm
+*.db-wal
+
+## OS files
+Thumbs.db
+.DS_Store
