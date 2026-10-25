@@ -119,6 +119,12 @@ All 16 unit tests cover database CRUD, full-text and partial search, duplicate h
 
 ---
 
+## 🙏 Acknowledgements & Credits
+
+- Special credit and inspiration to **[MeheReal/clipboardmanager](https://github.com/MeheReal/clipboardmanager)** by [MeheReal](https://github.com/MeheReal) for inspiring key clipboard management ideas and workflows.
+
+---
+
 ## 📂 Project Structure
 
 ```

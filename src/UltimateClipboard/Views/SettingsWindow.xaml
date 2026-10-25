@@ -169,6 +169,23 @@
                 </StackPanel>
             </Border>
 
+            <!-- About & Acknowledgements Section -->
+            <Border Background="{DynamicResource CardBackground}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="About &amp; Acknowledgements" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="Ultimate Clipboard v1.1.0" FontWeight="Medium" FontSize="13" Margin="0,0,0,4"/>
+                    <TextBlock Text="A native, private Windows clipboard manager with on-device OCR, AI visual search, and file preview." 
+                               FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                    <TextBlock Text="Special thanks and credit to MeheReal's clipboardmanager for inspiration:" 
+                               FontSize="11" Foreground="{DynamicResource TertiaryTextBrush}" Margin="0,0,0,4"/>
+                    <TextBlock FontSize="12">
+                        <Hyperlink NavigateUri="https://github.com/MeheReal/clipboardmanager" RequestNavigate="Hyperlink_RequestNavigate" Foreground="{DynamicResource AccentBrush}">
+                            https://github.com/MeheReal/clipboardmanager
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
             <!-- Status & Action Buttons -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
                 <TextBlock Text="{Binding StatusMessage}" 
