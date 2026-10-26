@@ -107,6 +107,71 @@ public class ClipboardEntry
     [JsonIgnore]
     public int ExtraFileCount => ParsedFilePaths.Length > 4 ? ParsedFilePaths.Length - 4 : 0;
 
+    [JsonIgnore]
+    public bool IsUrl
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(PlainText)) return false;
+            var t = PlainText.Trim();
+            return t.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                   t.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    [JsonIgnore]
+    public string UrlDomain
+    {
+        get
+        {
+            if (!IsUrl) return string.Empty;
+            try
+            {
+                var uri = new Uri(PlainText!.Trim());
+                return uri.Host;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+    }
+
+    [JsonIgnore]
+    public bool IsHexColor
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(PlainText)) return false;
+            var t = PlainText.Trim();
+            if (!t.StartsWith("#")) return false;
+            if (t.Length != 4 && t.Length != 7 && t.Length != 9) return false;
+            for (int i = 1; i < t.Length; i++)
+            {
+                char c = t[i];
+                if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')))
+                    return false;
+            }
+            return true;
+        }
+    }
+
+    [JsonIgnore]
+    public List<string> DisplayTags
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Tags)) return new List<string>();
+            return Tags.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                       .Distinct(StringComparer.OrdinalIgnoreCase)
+                       .Take(4)
+                       .ToList();
+        }
+    }
+
+    [JsonIgnore]
+    public bool HasTags => DisplayTags.Count > 0;
+
     private string FormatFilesPreview()
     {
         var paths = ParsedFilePaths;

@@ -7,7 +7,6 @@ using System.Windows.Media.Animation;
 using UltimateClipboard.Helpers;
 using UltimateClipboard.ViewModels;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using MessageBox = System.Windows.MessageBox;
 
 namespace UltimateClipboard.Views;
 
@@ -44,12 +43,13 @@ public partial class ClipboardPanel : Window
 
     private void Window_Deactivated(object? sender, EventArgs e)
     {
-        // Hide panel when user clicks away
+        // Hide panel when user clicks away to another application
         Hide();
     }
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
+        // Esc: close panel
         if (e.Key == Key.Escape)
         {
             Hide();
@@ -57,6 +57,7 @@ public partial class ClipboardPanel : Window
             return;
         }
 
+        // Ctrl+F: focus and select search box
         if (e.Key == Key.F && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
         {
             FocusSearchBox();
@@ -64,6 +65,31 @@ public partial class ClipboardPanel : Window
             return;
         }
 
+        // Ctrl+1 through Ctrl+9: quick-copy item by index
+        if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            int index = -1;
+            if (e.Key >= Key.D1 && e.Key <= Key.D9)
+            {
+                index = (int)e.Key - (int)Key.D1;
+            }
+            else if (e.Key >= Key.NumPad1 && e.Key <= Key.NumPad9)
+            {
+                index = (int)e.Key - (int)Key.NumPad1;
+            }
+
+            if (index >= 0)
+            {
+                if (_viewModel.TryCopyByIndex(index))
+                {
+                    Hide();
+                    e.Handled = true;
+                    return;
+                }
+            }
+        }
+
+        // Enter: copy selected or first matching entry
         if (e.Key == Key.Enter)
         {
             if (_viewModel.SelectedEntry is not null)
@@ -71,10 +97,18 @@ public partial class ClipboardPanel : Window
                 _viewModel.SelectAndCopyCommand.Execute(_viewModel.SelectedEntry);
                 Hide();
                 e.Handled = true;
+                return;
             }
-            return;
+            else if (_viewModel.Entries.Count > 0)
+            {
+                _viewModel.SelectAndCopyCommand.Execute(_viewModel.Entries[0]);
+                Hide();
+                e.Handled = true;
+                return;
+            }
         }
 
+        // Down arrow from SearchBox focuses the first item in the list
         if (e.Key == Key.Down && SearchBox.IsFocused)
         {
             if (EntriesList.Items.Count > 0)
@@ -88,6 +122,18 @@ public partial class ClipboardPanel : Window
             return;
         }
 
+        // Up arrow from first item focuses SearchBox
+        if (e.Key == Key.Up && !SearchBox.IsFocused)
+        {
+            if (EntriesList.SelectedIndex <= 0)
+            {
+                FocusSearchBox();
+                e.Handled = true;
+                return;
+            }
+        }
+
+        // Delete key removes selected entry
         if (e.Key == Key.Delete && !SearchBox.IsFocused)
         {
             if (_viewModel.SelectedEntry is not null)
@@ -138,40 +184,28 @@ public partial class ClipboardPanel : Window
         }
     }
 
-    private void ClearAllButton_Click(object sender, RoutedEventArgs e)
-    {
-        var result = MessageBox.Show(
-            "Are you sure you want to clear all unpinned clipboard history?\nPinned items will be preserved.",
-            "Clear History",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-
-        if (result == MessageBoxResult.Yes)
-        {
-            _viewModel.ClearHistoryCommand.Execute(null);
-        }
-    }
-
     private double _targetVerticalOffset = -1;
 
     /// <summary>
-    /// Smooth animated scrolling on mouse wheel.
+    /// Smooth animated scrolling on mouse wheel with cubic deceleration.
     /// </summary>
     private void EntriesList_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
         var scrollViewer = GetScrollViewer(EntriesList);
         if (scrollViewer is null) return;
 
-        double baseOffset = _targetVerticalOffset >= 0 ? _targetVerticalOffset : scrollViewer.VerticalOffset;
+        double currentOffset = scrollViewer.VerticalOffset;
+        double baseOffset = _targetVerticalOffset >= 0 ? _targetVerticalOffset : currentOffset;
         double targetOffset = baseOffset - (e.Delta * 0.85);
         targetOffset = Math.Max(0, Math.Min(targetOffset, scrollViewer.ScrollableHeight));
         _targetVerticalOffset = targetOffset;
 
         var animation = new DoubleAnimation
         {
+            From = currentOffset,
             To = targetOffset,
-            Duration = TimeSpan.FromMilliseconds(220),
-            EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+            Duration = TimeSpan.FromMilliseconds(180),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         };
 
         animation.Completed += (s, ev) =>
@@ -197,8 +231,8 @@ public partial class ClipboardPanel : Window
 
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
+        // Don't close window, just hide it so background monitoring stays active
         e.Cancel = true;
         Hide();
-        base.OnClosing(e);
     }
 }

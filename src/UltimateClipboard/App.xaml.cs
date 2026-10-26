@@ -258,7 +258,30 @@ public partial class App : Application
 
     public void ApplyTheme(string theme)
     {
-        var themeUri = theme.Equals("Light", StringComparison.OrdinalIgnoreCase)
+        bool isLight = false;
+        if (theme.Equals("Light", StringComparison.OrdinalIgnoreCase))
+        {
+            isLight = true;
+        }
+        else if (theme.Equals("Dark", StringComparison.OrdinalIgnoreCase))
+        {
+            isLight = false;
+        }
+        else // "System"
+        {
+            try
+            {
+                using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+                var value = key?.GetValue("AppsUseLightTheme");
+                if (value is int intVal && intVal == 1)
+                {
+                    isLight = true;
+                }
+            }
+            catch { }
+        }
+
+        var themeUri = isLight
             ? new Uri("Themes/LightTheme.xaml", UriKind.Relative)
             : new Uri("Themes/DarkTheme.xaml", UriKind.Relative);
 

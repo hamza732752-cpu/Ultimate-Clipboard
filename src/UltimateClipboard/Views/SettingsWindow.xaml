@@ -1,211 +1,484 @@
 <Window x:Class="UltimateClipboard.Views.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Settings - Ultimate Clipboard"
-        Width="520" Height="620"
-        MinWidth="450" MinHeight="500"
+        xmlns:conv="clr-namespace:UltimateClipboard.Converters"
+        Title="Settings — Ultimate Clipboard"
+        Width="580" Height="720"
+        MinWidth="500" MinHeight="580"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBackground}"
         Foreground="{DynamicResource PrimaryTextBrush}">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="24">
-            <!-- Header -->
-            <TextBlock Text="Settings" 
-                       FontSize="22" FontWeight="SemiBold"
-                       Foreground="{DynamicResource PrimaryTextBrush}"
-                       Margin="0,0,0,16"/>
+    <Window.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
+    </Window.Resources>
 
-            <!-- Appearance Section -->
-            <Border Background="{DynamicResource CardBackground}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
-                <StackPanel>
-                    <TextBlock Text="Appearance" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,12"/>
-                    <Grid Margin="0,4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Theme" FontWeight="Medium"/>
-                            <TextBlock Text="Choose dark or light visual style" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>   <!-- Header -->
+            <RowDefinition Height="*"/>      <!-- Scrollable content -->
+            <RowDefinition Height="Auto"/>   <!-- Action footer -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource HeaderBackground}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="24,18,24,18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0"
+                        Width="36" Height="36"
+                        CornerRadius="8"
+                        Background="{DynamicResource AccentLightBrush}"
+                        BorderBrush="{DynamicResource AccentBrush}"
+                        BorderThickness="1"
+                        Margin="0,0,14,0">
+                    <TextBlock Text="&#xE713;"
+                               FontFamily="{StaticResource SegoeIcons}"
+                               FontSize="18"
+                               Foreground="{DynamicResource AccentBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="Settings"
+                               FontFamily="{StaticResource SegoeUI}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryTextBrush}"/>
+                    <TextBlock Text="Customize appearances, background capture, retention, and AI recognition."
+                               FontFamily="{StaticResource SegoeUI}"
+                               FontSize="12"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Scrollable Settings Cards -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="24,16,24,16">
+            <StackPanel>
+
+                <!-- 1: Appearance Card -->
+                <Border Background="{DynamicResource CardBackground}" 
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CardRadius}" 
+                        Padding="18,16" 
+                        Margin="0,0,0,14">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="&#xE790;" FontFamily="{StaticResource SegoeIcons}" FontSize="15" 
+                                       Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Appearance" FontFamily="{StaticResource SegoeUI}" FontSize="14.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <ComboBox Grid.Column="1" Width="140" SelectedValue="{Binding Theme, Mode=TwoWay}" SelectedValuePath="Content">
-                            <ComboBoxItem Content="Dark"/>
-                            <ComboBoxItem Content="Light"/>
-                        </ComboBox>
-                    </Grid>
-                </StackPanel>
-            </Border>
 
-            <!-- History & Storage Section -->
-            <Border Background="{DynamicResource CardBackground}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
-                <StackPanel>
-                    <TextBlock Text="History &amp; Storage" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,12"/>
-                    
-                    <Grid Margin="0,6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Max History Entries" FontWeight="Medium"/>
-                            <TextBlock Text="Maximum number of items preserved" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                        <Grid Margin="0,4,0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Theme Style" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Choose system dynamic theme, obsidian dark, or clean studio light" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Width="140" Height="32"
+                                      SelectedValue="{Binding Theme, Mode=TwoWay}" 
+                                      SelectedValuePath="Content"
+                                      VerticalContentAlignment="Center"
+                                      FontFamily="{StaticResource SegoeUI}">
+                                <ComboBoxItem Content="System"/>
+                                <ComboBoxItem Content="Dark"/>
+                                <ComboBoxItem Content="Light"/>
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 2: General & Startup Card -->
+                <Border Background="{DynamicResource CardBackground}" 
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CardRadius}" 
+                        Padding="18,16" 
+                        Margin="0,0,0,14">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="&#xE7E7;" FontFamily="{StaticResource SegoeIcons}" FontSize="15" 
+                                       Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="General &amp; Startup" FontFamily="{StaticResource SegoeUI}" FontSize="14.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBox Grid.Column="1" Width="100" Text="{Binding MaxHistoryEntries, UpdateSourceTrigger=PropertyChanged}" Padding="6,4"/>
-                    </Grid>
 
-                    <Grid Margin="0,6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Retention (Days)" FontWeight="Medium"/>
-                            <TextBlock Text="Auto-delete non-pinned items older than N days" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                        <!-- Global Hotkey info -->
+                        <Grid Margin="0,4,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Global Shortcut Hotkey" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Summons the clipboard history flyout from anywhere in Windows" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="{DynamicResource SearchBoxBackground}" 
+                                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                                    CornerRadius="6" Padding="10,4" VerticalAlignment="Center">
+                                <TextBlock Text="Win + Shift + V" FontFamily="{StaticResource CodeFont}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}"/>
+                            </Border>
+                        </Grid>
+
+                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,4,0,10"/>
+
+                        <!-- Start Minimized -->
+                        <Grid Margin="0,4,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Start Minimized" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Launch silently into the system tray on application start" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" 
+                                      IsChecked="{Binding StartMinimized}" 
+                                      Style="{StaticResource ToggleSwitchStyle}"
+                                      VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,4,0,10"/>
+
+                        <!-- Launch at Windows Startup -->
+                        <Grid Margin="0,4,0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Launch on Windows Startup" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Automatically start clipboard monitoring when Windows boots" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" 
+                                      IsChecked="{Binding LaunchAtStartup}" 
+                                      Style="{StaticResource ToggleSwitchStyle}"
+                                      VerticalAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 3: On-Device AI & OCR Visual Search Card -->
+                <Border Background="{DynamicResource CardBackground}" 
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CardRadius}" 
+                        Padding="18,16" 
+                        Margin="0,0,0,14">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="&#xE946;" FontFamily="{StaticResource SegoeIcons}" FontSize="15" 
+                                       Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="On-Device AI &amp; Visual Search" FontFamily="{StaticResource SegoeUI}" FontSize="14.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBox Grid.Column="1" Width="100" Text="{Binding RetentionDays, UpdateSourceTrigger=PropertyChanged}" Padding="6,4"/>
-                    </Grid>
 
-                    <Grid Margin="0,6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Max Image Size (KB)" FontWeight="Medium"/>
-                            <TextBlock Text="Skip images exceeding this threshold" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                        <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Enable AI Visual Recognition &amp; OCR" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Index screenshot text and visual content locally (e.g. typing 'cat' or 'github' finds image)" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" 
+                                      IsChecked="{Binding EnableAiImageRecognition}" 
+                                      Style="{StaticResource ToggleSwitchStyle}"
+                                      VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Border Background="{DynamicResource AccentLightBrush}"
+                                BorderBrush="{DynamicResource AccentBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="10,8"
+                                Margin="0,4,0,0">
+                            <TextBlock Text="🔒 100% Private: All image classifications and OCR are performed locally on your device with zero internet requests or telemetry."
+                                       FontFamily="{StaticResource SegoeUI}"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- 4: History & Storage Card -->
+                <Border Background="{DynamicResource CardBackground}" 
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CardRadius}" 
+                        Padding="18,16" 
+                        Margin="0,0,0,14">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="&#xEDA2;" FontFamily="{StaticResource SegoeIcons}" FontSize="15" 
+                                       Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="History &amp; Storage Limits" FontFamily="{StaticResource SegoeUI}" FontSize="14.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBox Grid.Column="1" Width="100" Text="{Binding MaxImageSizeKB, UpdateSourceTrigger=PropertyChanged}" Padding="6,4"/>
-                    </Grid>
 
-                    <Grid Margin="0,6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Database Path" FontWeight="Medium"/>
-                            <TextBlock Text="Location of the SQLite history file" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                        <!-- Max History Entries -->
+                        <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Maximum History Entries" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Maximum clipboard items preserved in database" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" 
+                                     Text="{Binding MaxHistoryEntries, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ModernTextBoxStyle}"/>
+                        </Grid>
+
+                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,4,0,8"/>
+
+                        <!-- Retention Days -->
+                        <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Retention Period (Days)" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Auto-delete unpinned history older than N days" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" 
+                                     Text="{Binding RetentionDays, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ModernTextBoxStyle}"/>
+                        </Grid>
+
+                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,4,0,8"/>
+
+                        <!-- Max Image Size KB -->
+                        <Grid Margin="0,4,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Max Image Size (KB)" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Skip capturing raw image buffers larger than this limit" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" 
+                                     Text="{Binding MaxImageSizeKB, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ModernTextBoxStyle}"/>
+                        </Grid>
+
+                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,4,0,8"/>
+
+                        <!-- Database Path -->
+                        <Grid Margin="0,4,0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="180"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Database Path" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="SQLite local database location" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" 
+                                     Text="{Binding DatabasePath, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ModernTextBoxStyle}"
+                                     ToolTip="{Binding DatabasePath}"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 5: Privacy & Exclusions Card -->
+                <Border Background="{DynamicResource CardBackground}" 
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CardRadius}" 
+                        Padding="18,16" 
+                        Margin="0,0,0,14">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="&#xE72E;" FontFamily="{StaticResource SegoeIcons}" FontSize="15" 
+                                       Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Privacy &amp; Process Exclusions" FontFamily="{StaticResource SegoeUI}" FontSize="14.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBox Grid.Column="1" Width="180" Text="{Binding DatabasePath, UpdateSourceTrigger=PropertyChanged}" Padding="6,4" ToolTip="Custom file path or leave default"/>
-                    </Grid>
-                </StackPanel>
-            </Border>
 
-            <!-- Privacy & Exclusions Section -->
-            <Border Background="{DynamicResource CardBackground}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
-                <StackPanel>
-                    <TextBlock Text="Privacy &amp; Exclusions" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <TextBlock Text="Process names to ignore (separated by semicolons, e.g. keepassxc;1password;bitwarden;mstsc):" 
-                               FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" Margin="0,0,0,8"/>
-                    <TextBox Text="{Binding ExcludedApps, UpdateSourceTrigger=PropertyChanged}" 
-                             Padding="8,6" MinHeight="48" TextWrapping="Wrap" AcceptsReturn="True"/>
-                    <TextBlock Text="Note: Application exclusion is best-effort based on foreground process detection." 
-                               FontSize="11" Foreground="{DynamicResource TertiaryTextBrush}" Margin="0,6,0,0"/>
-                </StackPanel>
-            </Border>
+                        <TextBlock Text="Process names to ignore when copying (separated by semicolons, e.g. keepassxc;1password;bitwarden;mstsc):" 
+                                   FontFamily="{StaticResource SegoeUI}" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" Margin="0,0,0,8"/>
 
-            <!-- AI & Image Search Section -->
-            <Border Background="{DynamicResource CardBackground}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
-                <StackPanel>
-                    <TextBlock Text="AI Image Search (On-Device)" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <CheckBox IsChecked="{Binding EnableAiImageRecognition}" Margin="0,4" 
-                              Content="Enable on-device AI visual search for images and screenshots"/>
-                    <TextBlock Text="When enabled, screenshots and images are analyzed locally using an embedded neural network (e.g. searching 'cat', 'car', 'screen' will find relevant images). Completely private with zero cloud calls." 
-                               FontSize="11" Foreground="{DynamicResource TertiaryTextBrush}" TextWrapping="Wrap" Margin="0,4,0,0"/>
-                </StackPanel>
-            </Border>
+                        <TextBox Text="{Binding ExcludedApps, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource ModernTextBoxStyle}"
+                                 MinHeight="46" TextWrapping="Wrap" AcceptsReturn="True"/>
+                    </StackPanel>
+                </Border>
 
-            <!-- Updates Section -->
-            <Border Background="{DynamicResource CardBackground}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
-                <StackPanel>
-                    <TextBlock Text="Software Updates" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,12"/>
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Current Version" FontWeight="Medium"/>
-                            <TextBlock Text="{Binding CurrentVersion, StringFormat='Version {0}'}" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                <!-- 6: Software Updates Card -->
+                <Border Background="{DynamicResource CardBackground}" 
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CardRadius}" 
+                        Padding="18,16" 
+                        Margin="0,0,0,14">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="&#xE895;" FontFamily="{StaticResource SegoeIcons}" FontSize="15" 
+                                       Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Software Updates" FontFamily="{StaticResource SegoeUI}" FontSize="14.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Button Grid.Column="1" 
-                                Content="Check for Updates" 
-                                Command="{Binding CheckForUpdatesCommand}"
-                                Padding="14,6"
-                                Cursor="Hand"/>
-                    </Grid>
 
-                    <CheckBox IsChecked="{Binding AutoCheckUpdates}" Margin="0,4,0,8" 
-                              Content="Automatically check for updates on startup"/>
+                        <Grid Margin="0,2,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentVersion, StringFormat='Installed Version: {0}'}" 
+                                           FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Check GitHub for the latest releases and fixes" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <Button Grid.Column="1" 
+                                    Content="Check for Updates" 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding CheckForUpdatesCommand}"/>
+                        </Grid>
 
-                    <!-- Update status notification -->
-                    <TextBlock Text="{Binding UpdateStatus}" 
-                               Foreground="{DynamicResource AccentBrush}" 
-                               FontWeight="Medium" 
-                               FontSize="12" 
-                               Margin="0,4,0,4"
-                               TextWrapping="Wrap"/>
+                        <Separator Background="{DynamicResource BorderBrush}" Margin="0,2,0,10"/>
 
-                    <Button Content="Download Latest Release" 
-                            Command="{Binding DownloadUpdateCommand}"
-                            Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisConverter}}"
-                            Background="{DynamicResource SuccessBrush}" 
-                            Foreground="White" 
-                            BorderThickness="0"
-                            Padding="14,6" 
-                            HorizontalAlignment="Left" 
-                            Margin="0,4,0,0"
-                            Cursor="Hand"/>
-                </StackPanel>
-            </Border>
+                        <Grid Margin="0,2,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Automatic Update Check" FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13"/>
+                                <TextBlock Text="Silently verify for new releases when application launches" 
+                                           FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" 
+                                      IsChecked="{Binding AutoCheckUpdates}" 
+                                      Style="{StaticResource ToggleSwitchStyle}"
+                                      VerticalAlignment="Center"/>
+                        </Grid>
 
-            <!-- Startup Behavior Section -->
-            <Border Background="{DynamicResource CardBackground}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
-                <StackPanel>
-                    <TextBlock Text="Startup Behavior" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,12"/>
-                    
-                    <CheckBox IsChecked="{Binding StartMinimized}" Margin="0,4" Content="Start minimized to system tray"/>
-                </StackPanel>
-            </Border>
+                        <!-- Update status text -->
+                        <TextBlock Text="{Binding UpdateStatus}" 
+                                   Foreground="{DynamicResource AccentBrush}" 
+                                   FontFamily="{StaticResource SegoeUI}"
+                                   FontWeight="Medium" 
+                                   FontSize="12" 
+                                   Margin="0,4,0,4"
+                                   TextWrapping="Wrap"/>
 
-            <!-- About & Acknowledgements Section -->
-            <Border Background="{DynamicResource CardBackground}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
-                <StackPanel>
-                    <TextBlock Text="About &amp; Acknowledgements" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <TextBlock Text="Ultimate Clipboard v1.1.0" FontWeight="Medium" FontSize="13" Margin="0,0,0,4"/>
-                    <TextBlock Text="A native, private Windows clipboard manager with on-device OCR, AI visual search, and file preview." 
-                               FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" Margin="0,0,0,8"/>
-                    <TextBlock Text="Special thanks and credit to MeheReal's clipboardmanager for inspiration:" 
-                               FontSize="11" Foreground="{DynamicResource TertiaryTextBrush}" Margin="0,0,0,4"/>
-                    <TextBlock FontSize="12">
-                        <Hyperlink NavigateUri="https://github.com/MeheReal/clipboardmanager" RequestNavigate="Hyperlink_RequestNavigate" Foreground="{DynamicResource AccentBrush}">
-                            https://github.com/MeheReal/clipboardmanager
-                        </Hyperlink>
-                    </TextBlock>
-                </StackPanel>
-            </Border>
+                        <!-- Download button when update available -->
+                        <Button Content="Download Latest Release" 
+                                Command="{Binding DownloadUpdateCommand}"
+                                Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisConverter}}"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Background="{DynamicResource SuccessBrush}" 
+                                HorizontalAlignment="Left" 
+                                Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
 
-            <!-- Status & Action Buttons -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-                <TextBlock Text="{Binding StatusMessage}" 
+                <!-- 7: About & Credits Card -->
+                <Border Background="{DynamicResource CardBackground}" 
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CardRadius}" 
+                        Padding="18,16" 
+                        Margin="0,0,0,14">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="&#xE946;" FontFamily="{StaticResource SegoeIcons}" FontSize="15" 
+                                       Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="About &amp; Acknowledgements" FontFamily="{StaticResource SegoeUI}" FontSize="14.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Ultimate Clipboard — Native Windows Clipboard Manager" 
+                                   FontFamily="{StaticResource SegoeUI}" FontWeight="SemiBold" FontSize="13" Margin="0,2,0,4"/>
+                        <TextBlock Text="Engineered with C# 13, .NET 10, WPF, SQLite, Windows Native OCR, and On-Device MobileNet AI." 
+                                   FontFamily="{StaticResource SegoeUI}" FontSize="11.5" Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="Special thanks and full credit to MeheReal's clipboardmanager for inspiration:" 
+                                   FontFamily="{StaticResource SegoeUI}" FontSize="11" Foreground="{DynamicResource TertiaryTextBrush}" Margin="0,0,0,2"/>
+                        <TextBlock FontSize="12">
+                            <Hyperlink NavigateUri="https://github.com/MeheReal/clipboardmanager" RequestNavigate="Hyperlink_RequestNavigate" Foreground="{DynamicResource AccentBrush}">
+                                https://github.com/MeheReal/clipboardmanager
+                            </Hyperlink>
+                        </TextBlock>
+
+                        <TextBlock Text="Project Repository:" 
+                                   FontFamily="{StaticResource SegoeUI}" FontSize="11" Foreground="{DynamicResource TertiaryTextBrush}" Margin="0,8,0,2"/>
+                        <TextBlock FontSize="12">
+                            <Hyperlink NavigateUri="https://github.com/hamza732752-cpu/Ultimate-Clipboard" RequestNavigate="Hyperlink_RequestNavigate" Foreground="{DynamicResource AccentBrush}">
+                                https://github.com/hamza732752-cpu/Ultimate-Clipboard
+                            </Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Action Footer -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource StatusBarBackground}"
+                BorderBrush="{DynamicResource StatusBarBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="24,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Status Feedback -->
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusMessage}" 
+                           FontFamily="{StaticResource SegoeUI}"
                            Foreground="{DynamicResource AccentBrush}" 
                            VerticalAlignment="Center" 
-                           Margin="0,0,16,0" 
-                           FontWeight="Medium"/>
-                <Button Content="Clear All History" 
-                        Command="{Binding ClearHistoryCommand}"
-                        Padding="12,6" Margin="0,0,8,0"
-                        Background="{DynamicResource DangerBrush}" Foreground="White" BorderThickness="0"/>
-                <Button Content="Reset Defaults" 
-                        Command="{Binding ResetDefaultsCommand}"
-                        Padding="12,6" Margin="0,0,8,0"/>
-                <Button Content="Save" 
-                        Command="{Binding SaveCommand}"
-                        Padding="20,6" 
-                        Background="{DynamicResource AccentBrush}" Foreground="White" BorderThickness="0"
-                        FontWeight="SemiBold"/>
-            </StackPanel>
-        </StackPanel>
-    </ScrollViewer>
+                           FontWeight="Medium"
+                           FontSize="12.5"/>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Clear All History" 
+                            Command="{Binding ClearHistoryCommand}"
+                            Style="{StaticResource DangerButtonStyle}"
+                            Margin="0,0,8,0"
+                            ToolTip="Clears all unpinned history from the database"/>
+                    <Button Content="Reset Defaults" 
+                            Command="{Binding ResetDefaultsCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Margin="0,0,8,0"/>
+                    <Button Content="Save Settings" 
+                            Command="{Binding SaveCommand}"
+                            Style="{StaticResource PrimaryButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

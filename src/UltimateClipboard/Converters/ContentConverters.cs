@@ -143,3 +143,62 @@ public class BoolToSymbolConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotImplementedException();
 }
+
+/// <summary>
+/// Converts a hex color string (e.g. #FF5500 or #1E90FF) to a SolidColorBrush.
+/// </summary>
+public class HexToBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string hex && !string.IsNullOrWhiteSpace(hex))
+        {
+            try
+            {
+                var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex.Trim());
+                return new SolidColorBrush(color);
+            }
+            catch { }
+        }
+        return System.Windows.Media.Brushes.Transparent;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
+/// <summary>
+/// Converts 0-based AlternationIndex (0..8) to quick shortcut number string ("1".."9").
+/// </summary>
+public class AlternationIndexToShortcutConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int index && index >= 0 && index < 9)
+        {
+            return (index + 1).ToString();
+        }
+        return string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
+/// <summary>
+/// Returns Visible for top 9 items (index 0..8), Collapsed otherwise.
+/// </summary>
+public class AlternationIndexToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int index && index >= 0 && index < 9)
+        {
+            return Visibility.Visible;
+        }
+        return Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}

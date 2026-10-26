@@ -1,25 +1,54 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Dark Theme Colors -->
-    <SolidColorBrush x:Key="WindowBackground" Color="#1E1E2E"/>
-    <SolidColorBrush x:Key="PanelBackground" Color="#252536"/>
-    <SolidColorBrush x:Key="SearchBoxBackground" Color="#2D2D40"/>
-    <SolidColorBrush x:Key="CardBackground" Color="#2D2D40"/>
-    <SolidColorBrush x:Key="HoverBrush" Color="#353550"/>
-    <SolidColorBrush x:Key="SelectedBrush" Color="#3D3D5C"/>
-    <SolidColorBrush x:Key="BorderBrush" Color="#3D3D5C"/>
-    <SolidColorBrush x:Key="AccentBrush" Color="#6C63FF"/>
-    <SolidColorBrush x:Key="AccentHoverBrush" Color="#7B73FF"/>
-    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#E8E8F0"/>
-    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#9090A8"/>
-    <SolidColorBrush x:Key="TertiaryTextBrush" Color="#606078"/>
-    <SolidColorBrush x:Key="DangerBrush" Color="#E05555"/>
-    <SolidColorBrush x:Key="SuccessBrush" Color="#50C878"/>
-    <SolidColorBrush x:Key="PinnedBrush" Color="#FFB347"/>
-    <SolidColorBrush x:Key="FavoriteBrush" Color="#FF6B8A"/>
-    <SolidColorBrush x:Key="TypeIconTextBrush" Color="#6C63FF"/>
-    <SolidColorBrush x:Key="TypeIconBackgroundBrush" Color="#2D2D50"/>
-    <SolidColorBrush x:Key="StatusBarBackground" Color="#1A1A28"/>
+    <!-- Dark Theme Colors (Fluent 2 / Deep Obsidian Glass) -->
+    <SolidColorBrush x:Key="WindowBackground" Color="#12131C"/>
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#2D2F45"/>
+    <SolidColorBrush x:Key="PanelBackground" Color="#181926"/>
+    <SolidColorBrush x:Key="HeaderBackground" Color="#1E2030"/>
+    <SolidColorBrush x:Key="SearchBoxBackground" Color="#1C1E2D"/>
+    <SolidColorBrush x:Key="SearchBoxBorderBrush" Color="#2E314A"/>
+    <SolidColorBrush x:Key="CardBackground" Color="#1A1C2B"/>
+    <SolidColorBrush x:Key="CardBorderBrush" Color="#26283D"/>
+    <SolidColorBrush x:Key="HoverBrush" Color="#24273D"/>
+    <SolidColorBrush x:Key="HoverBorderBrush" Color="#3C4063"/>
+    <SolidColorBrush x:Key="SelectedBrush" Color="#2B2F4E"/>
+    <SolidColorBrush x:Key="SelectedBorderBrush" Color="#7C6CFA"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#2A2C42"/>
+    
+    <!-- Accent palette (Vibrant Electric Violet/Indigo) -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#7C6CFA"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#9082FA"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#6856EB"/>
+    <SolidColorBrush x:Key="AccentGlowBrush" Color="#2B7C6CFA"/>
+    <SolidColorBrush x:Key="AccentLightBrush" Color="#22203D"/>
+    
+    <!-- Text hierarchy -->
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#F4F4F8"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#A2A5BE"/>
+    <SolidColorBrush x:Key="TertiaryTextBrush" Color="#696D8A"/>
+    <SolidColorBrush x:Key="DisabledTextBrush" Color="#4A4D66"/>
+
+    <!-- Status & indicator colors -->
+    <SolidColorBrush x:Key="DangerBrush" Color="#F87171"/>
+    <SolidColorBrush x:Key="DangerHoverBrush" Color="#EF4444"/>
+    <SolidColorBrush x:Key="DangerLightBrush" Color="#2E1C22"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="#34D399"/>
+    <SolidColorBrush x:Key="SuccessGlowBrush" Color="#3534D399"/>
+    <SolidColorBrush x:Key="PinnedBrush" Color="#FBBF24"/>
+    <SolidColorBrush x:Key="FavoriteBrush" Color="#F43F5E"/>
+    <SolidColorBrush x:Key="LinkBrush" Color="#38BDF8"/>
+
+    <!-- Type Icon Badges -->
+    <SolidColorBrush x:Key="TypeIconTextBrush" Color="#7C6CFA"/>
+    <SolidColorBrush x:Key="TypeIconBackgroundBrush" Color="#252445"/>
+
+    <!-- Filter Bar Container -->
+    <SolidColorBrush x:Key="FilterContainerBrush" Color="#151624"/>
+    <SolidColorBrush x:Key="FilterPillHoverBrush" Color="#202236"/>
+
+    <!-- Status Bar -->
+    <SolidColorBrush x:Key="StatusBarBackground" Color="#13141F"/>
+    <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#1E2030"/>
 
 </ResourceDictionary>

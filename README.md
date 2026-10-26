@@ -73,8 +73,9 @@ dotnet run --project src/UltimateClipboard
 |---|---|
 | `Win + Shift + V` | Open or hide the Clipboard Panel (falls back to `Ctrl + Shift + V` if reserved) |
 | `Enter` | Restore selected item back to Windows clipboard and close panel |
-| `↑` / `↓` | Navigate through clipboard entries |
-| `Ctrl + F` | Jump to search input |
+| `Ctrl + 1` .. `Ctrl + 9` | Instant quick-copy for any of the top 9 items |
+| `↑` / `↓` | Navigate through clipboard entries (pressing `↑` at the top focuses Search) |
+| `Ctrl + F` | Jump directly to search input and select all text |
 | `Delete` | Delete the currently selected clipboard entry |
 | `Esc` | Dismiss / close the clipboard panel |
 

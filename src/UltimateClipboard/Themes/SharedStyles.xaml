@@ -2,28 +2,25 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Shared Fonts -->
-    <FontFamily x:Key="SegoeIcons">Segoe MDL2 Assets</FontFamily>
-    <FontFamily x:Key="SegoeUI">Segoe UI Variable, Segoe UI, Arial</FontFamily>
+    <FontFamily x:Key="SegoeIcons">Segoe MDL2 Assets, Segoe Fluent Icons, Segoe UI Symbol</FontFamily>
+    <FontFamily x:Key="SegoeUI">Segoe UI Variable Display, Segoe UI Variable, Segoe UI, Arial</FontFamily>
+    <FontFamily x:Key="CodeFont">Cascadia Code, Consolas, Courier New</FontFamily>
 
     <!-- Corner Radii -->
-    <CornerRadius x:Key="SmallRadius">4</CornerRadius>
+    <CornerRadius x:Key="SmallRadius">5</CornerRadius>
     <CornerRadius x:Key="MediumRadius">8</CornerRadius>
-    <CornerRadius x:Key="LargeRadius">12</CornerRadius>
-
-    <!-- Scrollbar Style -->
-    <Style TargetType="ScrollBar">
-        <Setter Property="Width" Value="6"/>
-        <Setter Property="MinWidth" Value="6"/>
-    </Style>
+    <CornerRadius x:Key="CardRadius">10</CornerRadius>
+    <CornerRadius x:Key="LargeRadius">14</CornerRadius>
+    <CornerRadius x:Key="PillRadius">20</CornerRadius>
 
     <!-- Focus Visual -->
     <Style x:Key="FocusVisualStyle">
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Rectangle StrokeThickness="2" 
+                    <Rectangle StrokeThickness="1.5" 
                                Stroke="{DynamicResource AccentBrush}" 
-                               RadiusX="4" RadiusY="4"
+                               RadiusX="6" RadiusY="6"
                                Margin="-2"
                                SnapsToDevicePixels="True"/>
                 </ControlTemplate>
@@ -31,20 +28,60 @@
         </Setter>
     </Style>
 
-    <!-- TextBox Style -->
+    <!-- Minimal Modern ScrollBar Style -->
+    <Style TargetType="ScrollBar">
+        <Setter Property="Width" Value="6"/>
+        <Setter Property="MinWidth" Value="6"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid Background="Transparent">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border Background="{DynamicResource TertiaryTextBrush}" 
+                                                    CornerRadius="3" 
+                                                    Opacity="0.45"
+                                                    Margin="1,0">
+                                                <VisualStateManager.VisualStateGroups>
+                                                    <VisualStateGroup x:Name="CommonStates">
+                                                        <VisualState x:Name="Normal"/>
+                                                        <VisualState x:Name="MouseOver">
+                                                            <Storyboard>
+                                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0.85" Duration="0:0:0.15"/>
+                                                            </Storyboard>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateManager.VisualStateGroups>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Search Box Style -->
     <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource SegoeUI}"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="Padding" Value="10,7"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource SearchBoxBorderBrush}"/>
         <Setter Property="Background" Value="{DynamicResource SearchBoxBackground}"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="CaretBrush" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource AccentBrush}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
-                    <Border Background="{TemplateBinding Background}"
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{StaticResource MediumRadius}"
@@ -54,8 +91,12 @@
                                       VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}"/>
+                        </Trigger>
                         <Trigger Property="IsFocused" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource WindowBackground}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -63,13 +104,13 @@
         </Setter>
     </Style>
 
-    <!-- Filter Button Style -->
+    <!-- Filter Segmented Pill Button Style -->
     <Style x:Key="FilterButtonStyle" TargetType="RadioButton">
         <Setter Property="FontFamily" Value="{StaticResource SegoeUI}"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
-        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="Padding" Value="11,5"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle}"/>
         <Setter Property="Template">
@@ -86,14 +127,15 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource AccentBrush}"/>
-                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True"/>
                                 <Condition Property="IsChecked" Value="False"/>
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource FilterPillHoverBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -101,7 +143,7 @@
         </Setter>
     </Style>
 
-    <!-- Icon Button Style (for pin, favorite, delete) -->
+    <!-- Icon Action Button Style (pin, favorite, copy, delete, explorer) -->
     <Style x:Key="IconButtonStyle" TargetType="Button">
         <Setter Property="FontFamily" Value="{StaticResource SegoeIcons}"/>
         <Setter Property="FontSize" Value="12"/>
@@ -116,6 +158,8 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Border"
                             Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="1"
                             CornerRadius="{StaticResource SmallRadius}"
                             SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center" 
@@ -124,7 +168,11 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}"/>
                             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource SelectedBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -132,18 +180,20 @@
         </Setter>
     </Style>
 
-    <!-- List Item Style -->
+    <!-- Clipboard List Item Card Style -->
     <Style x:Key="ClipboardListBoxItemStyle" TargetType="ListBoxItem">
-        <Setter Property="Padding" Value="12,8"/>
-        <Setter Property="Margin" Value="4,1"/>
+        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Margin" Value="4,2"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
                     <Border x:Name="Border"
-                            Background="Transparent"
-                            CornerRadius="{StaticResource MediumRadius}"
+                            Background="{DynamicResource CardBackground}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource CardRadius}"
                             Padding="{TemplateBinding Padding}"
                             SnapsToDevicePixels="True">
                         <ContentPresenter/>
@@ -151,9 +201,11 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource SelectedBrush}"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource SelectedBorderBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -165,8 +217,9 @@
     <Style x:Key="ClearAllButtonStyle" TargetType="Button">
         <Setter Property="FontFamily" Value="{StaticResource SegoeUI}"/>
         <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
-        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="Padding" Value="9,4"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle}"/>
         <Setter Property="Template">
@@ -182,7 +235,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource DangerLightBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -190,10 +243,192 @@
         </Setter>
     </Style>
 
-    <!-- Smooth ScrollViewer Style -->
-    <Style x:Key="SmoothScrollViewerStyle" TargetType="ScrollViewer">
-        <Setter Property="CanContentScroll" Value="False"/>
-        <Setter Property="PanningMode" Value="VerticalOnly"/>
+    <!-- Modern Windows 11 ToggleSwitch Style for CheckBox -->
+    <Style x:Key="ToggleSwitchStyle" TargetType="CheckBox">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Grid VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Track pill -->
+                        <Border x:Name="Track"
+                                Grid.Column="0"
+                                Width="40" Height="20"
+                                CornerRadius="10"
+                                Background="{DynamicResource CardBorderBrush}"
+                                BorderBrush="{DynamicResource HoverBorderBrush}"
+                                BorderThickness="1">
+                            <!-- Thumb circle -->
+                            <Ellipse x:Name="Thumb"
+                                     Width="14" Height="14"
+                                     Fill="{DynamicResource SecondaryTextBrush}"
+                                     HorizontalAlignment="Left"
+                                     Margin="3,0,3,0"/>
+                        </Border>
+
+                        <ContentPresenter Grid.Column="1" 
+                                          Margin="10,0,0,0" 
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Track" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                            <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            <Setter TargetName="Thumb" Property="Fill" Value="#FFFFFF"/>
+                            <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource AccentHoverBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Primary Accent Gradient Button Style -->
+    <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+        <Setter Property="FontFamily" Value="{StaticResource SegoeUI}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="#FFFFFF"/>
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource MediumRadius}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource AccentHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource AccentPressedBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Secondary Outline Button Style -->
+    <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+        <Setter Property="FontFamily" Value="{StaticResource SegoeUI}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="14,7"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource MediumRadius}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Modern Input TextBox Style -->
+    <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
+        <Setter Property="FontFamily" Value="{StaticResource SegoeUI}"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource SearchBoxBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource SmallRadius}"
+                            SnapsToDevicePixels="True">
+                        <ScrollViewer x:Name="PART_ContentHost" 
+                                      Margin="0"
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource HoverBorderBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Danger Button Style -->
+    <Style x:Key="DangerButtonStyle" TargetType="Button">
+        <Setter Property="FontFamily" Value="{StaticResource SegoeUI}"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="#FFFFFF"/>
+        <Setter Property="Background" Value="{DynamicResource DangerBrush}"/>
+        <Setter Property="Padding" Value="14,6"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource MediumRadius}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource DangerHoverBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

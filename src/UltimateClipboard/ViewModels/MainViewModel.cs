@@ -48,9 +48,19 @@ public class MainViewModel : ViewModelBase
         {
             if (SetProperty(ref _searchQuery, value))
             {
+                OnPropertyChanged(nameof(HasSearchQuery));
                 _ = SearchAsync();
             }
         }
+    }
+
+    public bool HasSearchQuery => !string.IsNullOrWhiteSpace(_searchQuery);
+
+    private bool _isConfirmingClear;
+    public bool IsConfirmingClear
+    {
+        get => _isConfirmingClear;
+        set => SetProperty(ref _isConfirmingClear, value);
     }
 
     private string _activeFilter = "All";
@@ -112,6 +122,10 @@ public class MainViewModel : ViewModelBase
     public ICommand RefreshCommand { get; }
     public ICommand SetFilterCommand { get; }
     public ICommand OpenInExplorerCommand { get; }
+    public ICommand PromptClearCommand { get; }
+    public ICommand CancelClearCommand { get; }
+    public ICommand ConfirmClearCommand { get; }
+    public ICommand ClearSearchCommand { get; }
 
     public MainViewModel(ClipboardDatabase database, ClipboardCapture capture, ClipboardRestore restore, SettingsService settingsService, ImageRecognitionService? imageRecognitionService = null)
     {
@@ -129,6 +143,28 @@ public class MainViewModel : ViewModelBase
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         SetFilterCommand = new RelayCommand(p => ActiveFilter = p as string ?? "All");
         OpenInExplorerCommand = new RelayCommand(OpenInExplorer);
+
+        PromptClearCommand = new RelayCommand(_ => IsConfirmingClear = true);
+        CancelClearCommand = new RelayCommand(_ => IsConfirmingClear = false);
+        ConfirmClearCommand = new AsyncRelayCommand(async () =>
+        {
+            IsConfirmingClear = false;
+            await ClearHistoryAsync();
+        });
+        ClearSearchCommand = new RelayCommand(_ => SearchQuery = string.Empty);
+    }
+
+    /// <summary>
+    /// Attempts to select and copy the entry at the specified zero-based index (e.g. for Ctrl+1..Ctrl+9).
+    /// </summary>
+    public bool TryCopyByIndex(int index)
+    {
+        if (index >= 0 && index < Entries.Count)
+        {
+            SelectAndCopyCommand.Execute(Entries[index]);
+            return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -236,6 +272,11 @@ public class MainViewModel : ViewModelBase
                     entry.ImageData = null; // Free memory, keep ThumbnailData
                 Entries.Add(entry);
             }
+            if (Entries.Count > 0 && SelectedIndex < 0)
+            {
+                SelectedIndex = 0;
+                SelectedEntry = Entries[0];
+            }
             OnPropertyChanged(nameof(IsEmpty));
         });
 
@@ -256,6 +297,14 @@ public class MainViewModel : ViewModelBase
             if (token.IsCancellationRequested) return;
 
             await RefreshAsync();
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                if (Entries.Count > 0)
+                {
+                    SelectedIndex = 0;
+                    SelectedEntry = Entries[0];
+                }
+            });
         }
         catch (OperationCanceledException)
         {
